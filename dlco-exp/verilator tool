@@ -1,0 +1,7 @@
+verilator -cc <name>
+verilator -Wall --trace -cc <name.v> --exe <name.cpp> --build
+make -C obj_dir -f <Vname.mk> <Vname>
+./obj_dir/Vname
+gtkwave name.vcd
+
+
