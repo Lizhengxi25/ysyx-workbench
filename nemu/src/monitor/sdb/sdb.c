@@ -58,11 +58,15 @@ static int cmd_si(char *args) {
   
   if(arg == NULL){
   	n = 1;
-  	printf("too few arguments\n");
   }else{
   	n = atoi(arg);
   }
   cpu_exec(n);
+  return 0;
+}
+
+static int cmd_ifr(char *args) {
+  isa_reg_display();
   return 0;
 }
 
@@ -76,7 +80,8 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "single", cmd_si},
+  { "si", "several steps", cmd_si},
+  { "ifr", "print ram", cmd_ifr},
 
   /* TODO: Add more commands */
 
