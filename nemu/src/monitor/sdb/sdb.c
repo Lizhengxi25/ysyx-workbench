@@ -49,6 +49,7 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+  printf(" ");
   return -1;
 }
 
@@ -66,7 +67,25 @@ static int cmd_si(char *args) {
 }
 
 static int cmd_ifr(char *args) {
-  isa_reg_display();
+  char *r = "r";
+  char *arg = strtok(args, " ");
+  if(strcmp(arg, r)==0){
+  	isa_reg_display();
+  }else{
+  	return 1;
+  }
+  return 0;
+}
+
+word_t vaddr_read(vaddr_t addr, int len);
+
+static int cmd_scm(char *args) {
+  int lent = atoi(strtok(args, " "));
+  vaddr_t begining;
+  sscanf(strtok(NULL, " "), "%lx", &begining);
+  for(int i = 0; i < lent; i++){
+  	printf("0x%lx\n", vaddr_read(begining + (i*4), 4));
+  }
   return 0;
 }
 
@@ -81,7 +100,8 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "several steps", cmd_si},
-  { "ifr", "print ram", cmd_ifr},
+  { "info", "print reg", cmd_ifr},
+  { "x", "scan mem", cmd_scm},
 
   /* TODO: Add more commands */
 
