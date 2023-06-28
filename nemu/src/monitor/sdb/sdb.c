@@ -89,6 +89,20 @@ static int cmd_scm(char *args) {
   return 0;
 }
 
+static int cmd_exp(char *args) {
+  if(args == NULL) {
+	printf("Nothing\n");
+	return 0;
+  }
+  bool success = true;
+  char bbb = expr(args, &success);
+  if(success == true){
+  	printf("%c\n", bbb);
+  }else{
+  	printf("Unsuccess to identify\n");
+  }
+  return 0;
+}
 static int cmd_help(char *args);
 
 static struct {
@@ -102,6 +116,7 @@ static struct {
   { "si", "several steps", cmd_si},
   { "info", "print reg", cmd_ifr},
   { "x", "scan mem", cmd_scm},
+  { "p", "expression", cmd_exp},
 
   /* TODO: Add more commands */
 
