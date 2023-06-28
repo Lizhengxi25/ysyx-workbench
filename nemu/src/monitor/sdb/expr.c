@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_DEC, TK_EQ,
+  TK_NOTYPE = 256, TK_NUM, TK_EQ,
 
   /* TODO: Add more token types */
 
@@ -35,7 +35,7 @@ static struct rule {
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
    */
-  {"[0-9]+", TK_DEC},   // dec
+  {"[0-9]+", TK_NUM},   // dec
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"-", '-'},		// minus
@@ -106,10 +106,10 @@ static bool make_token(char *e) {
         	case '/':
         	case '(':
         	case ')':
-        	case TK_DEC:
+        	case TK_NUM:
         		tokens[nr_token].type=rules[i].token_type;
-        		strncpy(tokens[nr_token++].str, substr_start, substr_len);
         		tokens[nr_token].str[substr_len] = '\0';
+        		strncpy(tokens[nr_token++].str, substr_start, substr_len);
         		break;
         	case TK_NOTYPE:
         		break;
@@ -130,6 +130,70 @@ static bool make_token(char *e) {
 }
 
 
+int check_parentheses(){
+  
+}
+
+
+int searchmo(int p, int q){
+  int j = 0;
+  int judge = 0;
+  int sign = 0;
+  for(j = p; j <= q; j++)
+  {
+  	if(tokens[j].type == '('){
+  		judge++;
+  	}else if(tokens[j].type == ')'){
+  		judge--;
+  	}else if(tokens[j].type == TK_NUM){
+  		continue;
+  	}else if(judge != 0){
+  		continue;
+  	}else if(tokens[j].type == '+'){
+  		sign = 1;
+  		*optype = "+";
+  		return p;
+  	}else if(tokens[j].type == '-'){
+  		sign = 1;
+  		*optype = "-";
+  		return p;
+  	}else if(sign == 0 && tokens[j].type == '*'){
+  		sign = 0;
+  		*optype = "*";
+  		return p;
+  	}else if(sign == 0 && tokens[j].type == '/'){
+  		sign = 0;
+  		*optype = "/";
+  		return p;
+  	}
+  }	
+}
+int eval(int p, int q){
+  int value_1 = 0;
+  int value_2 = 0;
+  
+  if(p > q) {
+  	/*bad expression*/
+  	return 0;
+  }
+  else if(p == q) {
+  	/*single number*/
+  	
+  }
+  else if(check_parentheses(p, q) == true) {
+  	/*a pair of parentheses surround the expression*/
+  	return eval(p+1, q-1);
+  }else{
+  	char op;
+  	char *optype;
+  	op = searchmo(p, q);
+	value_1 = eval(p, op-1);
+	value_2 = eval(op+1, q);
+	switch (*optype){
+	
+	}
+  }
+}
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
