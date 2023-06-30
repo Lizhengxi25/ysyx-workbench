@@ -166,7 +166,8 @@ bool check_parentheses(int p, int q){
 int searchmo(int p, int q){
   int j = 0;
   int judge = 0;
-  int sign = 0;
+  int sign = 1;
+  int place = 34;
   for(j = p; j <= q; j++)
   {
   	if(tokens[j].type == '('){
@@ -178,27 +179,31 @@ int searchmo(int p, int q){
   	}else if(judge != 0){
   		continue;
   	}else if(judge == 0 && tokens[j].type == '+'){
-  		sign = 1;
   		return j;
   	}else if(judge == 0 && tokens[j].type == '-'){
-  		sign = 1;
   		return j;
-  	}else if(judge == 0 && sign == 0 && tokens[j].type == '*'){
-  		sign = 0;
-  		return j;
-  	}else if(judge == 0 && sign == 0 && tokens[j].type == '/'){
-  		sign = 0;
-  		return j;
+  	}else if(judge == 0 && sign == 1 && tokens[j].type == '*'){
+  		sign *= 2;
+  		place = j;
+  	}else if(judge == 0 && sign == 1 && tokens[j].type == '/'){
+  		sign *= 2;
+  		place = j;
   	}
   }
-  panic("bad\n");
-  check_wrong = false;	
+  if(sign % 2 == 0){
+  	return place;
+  }else{
+	  check_wrong = false;
+	  return 0;
+  }
 }
 
 int eval(int p, int q){
   int value_1 = 0;
   int value_2 = 0;
-  
+  if(check_wrong == false){
+  	return 1;
+  }else{
   if(p > q) {
   	/*bad expression*/
   	check_wrong = false;
@@ -206,7 +211,7 @@ int eval(int p, int q){
   }
   else if(p == q) {
   	/*single number*/
-  	if(tokens[p].type != TK_NUM){
+  	if(tokens[p].type != TK_NUM && tokens[p].type != '+'){
   		check_wrong = false;
   		return 1;
   	}else{
@@ -220,6 +225,9 @@ int eval(int p, int q){
   }else{
   	int op;
   	op = searchmo(p, q);
+  	if(op == p){
+  		;
+  	}
   	printf("op = %d\n", op);
 	value_1 = eval(p, op-1);
 	value_2 = eval(op+1, q);
@@ -238,9 +246,11 @@ int eval(int p, int q){
 			}
 			return value_1/value_2;
 		default : 
-			panic("Error expression\n");
+			check_wrong = false;
+			return 1;
 	}
   }
+}
 }
 
 word_t expr(char *e, bool *success) {

@@ -99,7 +99,7 @@ static int cmd_exp(char *args) {
   if(success == true){
   	printf("%d\n", resultt);
   }else{
-  	printf("Unsuccess to identify\n");
+  	printf("Bad Expression\n");
   }
   return 0;
 }
