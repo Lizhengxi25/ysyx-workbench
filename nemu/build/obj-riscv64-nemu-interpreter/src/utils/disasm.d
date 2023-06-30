@@ -1,8 +1,8 @@
-cmd_/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o := unused
+cmd_/home/james/ysyx/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o := unused
 
-source_/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o := src/utils/disasm.cc
+source_/home/james/ysyx/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o := src/utils/disasm.cc
 
-deps_/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o := \
+deps_/home/james/ysyx/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o := \
   /usr/lib/llvm-14/include/llvm/MC/MCAsmInfo.h \
   /usr/lib/llvm-14/include/llvm/ADT/StringRef.h \
   /usr/lib/llvm-14/include/llvm/ADT/DenseMapInfo.h \
@@ -133,6 +133,6 @@ deps_/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-in
   /usr/lib/llvm-14/include/llvm/Config/Disassemblers.def \
   /usr/lib/llvm-14/include/llvm/Config/TargetMCAs.def \
 
-/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o: $(deps_/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o)
+/home/james/ysyx/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o: $(deps_/home/james/ysyx/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o)
 
-$(deps_/home/gjb_lizhengxi/Documents/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o):
+$(deps_/home/james/ysyx/ysyx-workbench/nemu/build/obj-riscv64-nemu-interpreter/src/utils/disasm.o):

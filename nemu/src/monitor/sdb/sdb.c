@@ -89,6 +89,11 @@ static int cmd_scm(char *args) {
   return 0;
 }
 
+static int cmd_exp(char *args) {
+  
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -102,6 +107,7 @@ static struct {
   { "si", "several steps", cmd_si},
   { "info", "print reg", cmd_ifr},
   { "x", "scan mem", cmd_scm},
+  { "p", "expression", cmd_exp},
 
   /* TODO: Add more commands */
 
