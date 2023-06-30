@@ -201,6 +201,8 @@ int searchmo(int p, int q){
 int eval(int p, int q){
   int value_1 = 0;
   int value_2 = 0;
+  int hhh_1 = 1;
+  int hhh_2 = 0;
   if(check_wrong == false){
   	return 1;
   }else{
@@ -211,7 +213,7 @@ int eval(int p, int q){
   }
   else if(p == q) {
   	/*single number*/
-  	if(tokens[p].type != TK_NUM && tokens[p].type != '+'){
+  	if(tokens[p].type != TK_NUM){
   		check_wrong = false;
   		return 1;
   	}else{
@@ -226,11 +228,12 @@ int eval(int p, int q){
   	int op;
   	op = searchmo(p, q);
   	if(op == p){
-  		;
+  		hhh_1 = 0;
+  		hhh_2 = -1;
   	}
   	printf("op = %d\n", op);
-	value_1 = eval(p, op-1);
-	value_2 = eval(op+1, q);
+	value_1 = hhh_1*eval(p, op-1);
+	value_2 = hhh_2*eval(op+1, q);
 	printf("value_1=%d value_2=%d\n", value_1, value_2);
 	switch (tokens[op].type){
 		case '+':

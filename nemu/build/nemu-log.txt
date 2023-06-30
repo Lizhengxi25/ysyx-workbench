@@ -5,12 +5,11 @@
 [1;34m[src/monitor/monitor.c:29 welcome] If trace is enabled, a log file will be generated to record the trace. This may lead to a large log file. If it is not necessary, you can disable it in menuconfig[0m
 [1;34m[src/monitor/monitor.c:32 welcome] Build time: 14:34:36, Jun 27 2023[0m
 [1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 0 with len 1: 2[0m
-[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[4] = "\*" at position 1 with len 1: *[0m
+[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[3] = "-" at position 1 with len 1: -[0m
 [1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 2 with len 1: 3[0m
 [1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[2] = "\+" at position 3 with len 1: +[0m
-[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 4 with len 1: 1[0m
-[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 0 with len 1: 1[0m
-[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[2] = "\+" at position 1 with len 1: +[0m
-[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 2 with len 1: 3[0m
-[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[4] = "\*" at position 3 with len 1: *[0m
 [1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 4 with len 1: 4[0m
+[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[3] = "-" at position 0 with len 1: -[0m
+[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 1 with len 1: 2[0m
+[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[2] = "\+" at position 2 with len 1: +[0m
+[1;34m[src/monitor/sdb/expr.c:92 make_token] match rules[0] = "[0-9]+" at position 3 with len 1: 4[0m
