@@ -133,7 +133,7 @@ bool check_wrong = true;
 
 bool check_parentheses(int p, int q){
   int judge = 0;
-  int j = 0;
+  int j = p;
   int cnt = 0;
   if(tokens[p].type != '(' && tokens[q].type != ')'){
   	return false;
@@ -155,7 +155,6 @@ bool check_parentheses(int p, int q){
   }else if(cnt == 1 && tokens[p].type == '(' && tokens[q].type == ')'){
   	return true;
   }else if(cnt != 1){
-  	check_wrong = false;
   	return false;
   }else{
   	return false;
