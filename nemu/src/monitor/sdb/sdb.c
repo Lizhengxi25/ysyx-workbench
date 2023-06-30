@@ -90,10 +90,26 @@ static int cmd_scm(char *args) {
 }
 
 static int cmd_exp(char *args) {
+<<<<<<< HEAD
   
   return 0;
 }
 
+=======
+  if(args == NULL) {
+	printf("Nothing\n");
+	return 0;
+  }
+  bool success = true;
+  int resultt = expr(args, &success);
+  if(success == true){
+  	printf("%d\n", resultt);
+  }else{
+  	printf("Unsuccess to identify\n");
+  }
+  return 0;
+}
+>>>>>>> origin
 static int cmd_help(char *args);
 
 static struct {

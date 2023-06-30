@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_NUM, TK_EQ,
 
   /* TODO: Add more token types */
 
@@ -35,9 +35,14 @@ static struct rule {
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
    */
-
+  {"[0-9]+", TK_NUM},   // dec
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
+  {"-", '-'},		// minus
+  {"\\*", '*'}, 	// multiple
+  {"/", '/'}, 		// divide
+  {"\\(", '('},		// par1
+  {"\\)", ')'},		// par2
   {"==", TK_EQ},        // equal
 };
 
@@ -95,6 +100,19 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
+        	case '+':
+        	case '-':
+        	case '*':
+        	case '/':
+        	case '(':
+        	case ')':
+        	case TK_NUM:
+        		tokens[nr_token].type=rules[i].token_type;
+        		tokens[nr_token].str[substr_len] = '\0';
+        		strncpy(tokens[nr_token++].str, substr_start, substr_len);
+        		break;
+        	case TK_NOTYPE:
+        		break;
           default: TODO();
         }
 
@@ -111,15 +129,138 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_wrong = true;
+
+bool check_parentheses(int p, int q){
+  int judge = 0;
+  int j = 0;
+  int cnt = 0;
+  if(tokens[p].type != '(' && tokens[q].type != ')'){
+  	return false;
+  }
+  for(; j <= q; j++){
+  	if(tokens[j].type == '('){
+  		judge++;
+ 	}
+ 	else if(tokens[j].type == ')'){
+	  	judge--;
+	}
+	if(judge == 0){
+		cnt++;
+	}
+  }
+  if(judge != 0){
+  	check_wrong = false;
+  	return false;
+  }else if(cnt == 1 && tokens[p].type == '(' && tokens[q].type == ')'){
+  	return true;
+  }else if(cnt != 1){
+  	check_wrong = false;
+  	return false;
+  }else{
+  	return false;
+  }
+  
+}
+
+
+int searchmo(int p, int q){
+  int j = 0;
+  int judge = 0;
+  int sign = 0;
+  for(j = p; j <= q; j++)
+  {
+  	if(tokens[j].type == '('){
+  		judge++;
+  	}else if(tokens[j].type == ')'){
+  		judge--;
+  	}else if(tokens[j].type == TK_NUM){
+  		continue;
+  	}else if(judge != 0){
+  		continue;
+  	}else if(judge == 0 && tokens[j].type == '+'){
+  		sign = 1;
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == '-'){
+  		sign = 1;
+  		return j;
+  	}else if(judge == 0 && sign == 0 && tokens[j].type == '*'){
+  		sign = 0;
+  		return j;
+  	}else if(judge == 0 && sign == 0 && tokens[j].type == '/'){
+  		sign = 0;
+  		return j;
+  	}
+  }
+  panic("bad\n");
+  check_wrong = false;	
+}
+
+int eval(int p, int q){
+  int value_1 = 0;
+  int value_2 = 0;
+  
+  if(p > q) {
+  	/*bad expression*/
+  	check_wrong = false;
+  	return 0;
+  }
+  else if(p == q) {
+  	/*single number*/
+  	if(tokens[p].type != TK_NUM){
+  		check_wrong = false;
+  		return 1;
+  	}else{
+  		printf("num=%d\n", atoi(tokens[p].str));
+  		return atoi(tokens[p].str);
+  	}
+  }
+  else if(check_parentheses(p, q) == true) {
+  	/*a pair of parentheses surround the expression*/
+  	return eval(p+1, q-1);
+  }else{
+  	int op;
+  	op = searchmo(p, q);
+  	printf("op = %d\n", op);
+	value_1 = eval(p, op-1);
+	value_2 = eval(op+1, q);
+	printf("value_1=%d value_2=%d\n", value_1, value_2);
+	switch (tokens[op].type){
+		case '+':
+			return value_1+value_2;
+		case '-':
+			return value_1-value_2;
+		case '*':
+			return value_1*value_2;
+		case '/':
+			if(value_2 == 0){
+				check_wrong = false;
+				return 0;
+			}
+			return value_1/value_2;
+		default : 
+			panic("Error expression\n");
+	}
+  }
+}
 
 word_t expr(char *e, bool *success) {
+  check_wrong = true;
   if (!make_token(e)) {
     *success = false;
     return 0;
   }
-
+  int num = eval(0, nr_token-1);
+  if(check_wrong == false){
+    *success = false;
+    return 0;
+  }
+  else{
+  printf("nr_token-1=%d\n", nr_token-1);
+    return num;
+  }
   /* TODO: Insert codes to evaluate the expression. */
   TODO();
-
+  
   return 0;
 }
