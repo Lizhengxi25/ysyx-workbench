@@ -95,9 +95,9 @@ static int cmd_exp(char *args) {
 	return 0;
   }
   bool success = true;
-  char bbb = expr(args, &success);
+  int resultt = expr(args, &success);
   if(success == true){
-  	printf("%c\n", bbb);
+  	printf("%d\n", resultt);
   }else{
   	printf("Unsuccess to identify\n");
   }

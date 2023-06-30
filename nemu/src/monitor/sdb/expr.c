@@ -129,8 +129,37 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_wrong = true;
 
-int check_parentheses(){
+bool check_parentheses(int p, int q){
+  int judge = 0;
+  int j = 0;
+  int cnt = 0;
+  if(tokens[p].type != '(' && tokens[q].type != ')'){
+  	return false;
+  }
+  for(; j <= q; j++){
+  	if(tokens[j].type == '('){
+  		judge++;
+ 	}
+ 	else if(tokens[j].type == ')'){
+	  	judge--;
+	}
+	if(judge == 0){
+		cnt++;
+	}
+  }
+  if(judge != 0){
+  	check_wrong = false;
+  	return false;
+  }else if(cnt == 1 && tokens[p].type == '(' && tokens[q].type == ')'){
+  	return true;
+  }else if(cnt != 1){
+  	check_wrong = false;
+  	return false;
+  }else{
+  	return false;
+  }
   
 }
 
@@ -149,58 +178,87 @@ int searchmo(int p, int q){
   		continue;
   	}else if(judge != 0){
   		continue;
-  	}else if(tokens[j].type == '+'){
+  	}else if(judge == 0 && tokens[j].type == '+'){
   		sign = 1;
-  		*optype = "+";
-  		return p;
-  	}else if(tokens[j].type == '-'){
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == '-'){
   		sign = 1;
-  		*optype = "-";
-  		return p;
-  	}else if(sign == 0 && tokens[j].type == '*'){
+  		return j;
+  	}else if(judge == 0 && sign == 0 && tokens[j].type == '*'){
   		sign = 0;
-  		*optype = "*";
-  		return p;
-  	}else if(sign == 0 && tokens[j].type == '/'){
+  		return j;
+  	}else if(judge == 0 && sign == 0 && tokens[j].type == '/'){
   		sign = 0;
-  		*optype = "/";
-  		return p;
+  		return j;
   	}
-  }	
+  }
+  panic("bad\n");
+  check_wrong = false;	
 }
+
 int eval(int p, int q){
   int value_1 = 0;
   int value_2 = 0;
   
   if(p > q) {
   	/*bad expression*/
+  	check_wrong = false;
   	return 0;
   }
   else if(p == q) {
   	/*single number*/
-  	
+  	if(tokens[p].type != TK_NUM){
+  		check_wrong = false;
+  		return 1;
+  	}else{
+  		printf("num=%d\n", atoi(tokens[p].str));
+  		return atoi(tokens[p].str);
+  	}
   }
   else if(check_parentheses(p, q) == true) {
   	/*a pair of parentheses surround the expression*/
   	return eval(p+1, q-1);
   }else{
-  	char op;
-  	char *optype;
+  	int op;
   	op = searchmo(p, q);
+  	printf("op = %d\n", op);
 	value_1 = eval(p, op-1);
 	value_2 = eval(op+1, q);
-	switch (*optype){
-	
+	printf("value_1=%d value_2=%d\n", value_1, value_2);
+	switch (tokens[op].type){
+		case '+':
+			return value_1+value_2;
+		case '-':
+			return value_1-value_2;
+		case '*':
+			return value_1*value_2;
+		case '/':
+			if(value_2 == 0){
+				check_wrong = false;
+				return 0;
+			}
+			return value_1/value_2;
+		default : 
+			panic("Error expression\n");
 	}
   }
 }
+
 word_t expr(char *e, bool *success) {
+  check_wrong = true;
   if (!make_token(e)) {
     *success = false;
     return 0;
   }
-  char aaa = tokens[0].str[0];
-  return aaa;
+  int num = eval(0, nr_token-1);
+  if(check_wrong == false){
+    *success = false;
+    return 0;
+  }
+  else{
+  printf("nr_token-1=%d\n", nr_token-1);
+    return num;
+  }
   /* TODO: Insert codes to evaluate the expression. */
   TODO();
   
