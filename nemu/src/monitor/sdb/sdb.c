@@ -90,12 +90,6 @@ static int cmd_scm(char *args) {
 }
 
 static int cmd_exp(char *args) {
-<<<<<<< HEAD
-  
-  return 0;
-}
-
-=======
   if(args == NULL) {
 	printf("Nothing\n");
 	return 0;
@@ -109,7 +103,6 @@ static int cmd_exp(char *args) {
   }
   return 0;
 }
->>>>>>> origin
 static int cmd_help(char *args);
 
 static struct {
