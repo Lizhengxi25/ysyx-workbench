@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_NUM, TK_EQ,
+  TK_NOTYPE = 256, TK_NUM, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT,
 
   /* TODO: Add more token types */
 
@@ -44,6 +44,10 @@ static struct rule {
   {"\\(", '('},		// par1
   {"\\)", ')'},		// par2
   {"==", TK_EQ},        // equal
+  {"!=", TK_UNEQ},	// unequal
+  {"&&", TK_AND},	// and
+  {"\\|\\|", TK_OR},	// or
+  {"[!(?!=)]", TK_NOT},	// not
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -106,6 +110,11 @@ static bool make_token(char *e) {
         	case '/':
         	case '(':
         	case ')':
+        	case TK_EQ:
+        	case TK_UNEQ:
+        	case TK_AND:
+        	case TK_OR:
+        	case TK_NOT:
         	case TK_NUM:
         		tokens[nr_token].type=rules[i].token_type;
         		tokens[nr_token].str[substr_len] = '\0';
@@ -165,9 +174,15 @@ bool check_parentheses(int p, int q){
 
 int searchmo(int p, int q){
   int j = 0;
-  int judge = 0;
-  int sign = 1;
-  int place = 34;
+  int judge = 0;   //judge parentheses
+  int judge_mul = 1;
+  int judge_div = 1;
+  int judge_eq = 1;
+  int adplace = -1;
+  int miplace = -1;
+  int muplace = 1;
+  int diplace = -1;
+  int nottplace = -1;
   for(j = p; j <= q; j++)
   {
   	if(tokens[j].type == '('){
@@ -178,21 +193,50 @@ int searchmo(int p, int q){
   		continue;
   	}else if(judge != 0){
   		continue;
-  	}else if(judge == 0 && tokens[j].type == '+'){
+  	}else if(judge == 0 && tokens[j].type == TK_EQ){
+  		judge_eq = 0;
   		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_UNEQ){
+  		judge_eq = 0;
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_AND){
+  		
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_OR){
+  		
+  		return j;
+  	}else if(judge == 0 && judge_eq == 1 && tokens[j].type == '+'){
+  		adplace = j;
   	}else if(judge == 0 && tokens[j].type == '-'){
-  		return j;
-  	}else if(judge == 0 && sign == 1 && tokens[j].type == '*'){
-  		sign *= 2;
-  		place = j;
-  	}else if(judge == 0 && sign == 1 && tokens[j].type == '/'){
-  		sign *= 2;
-  		place = j;
+  		if(judge_mul==1 && judge_div==1){
+  			miplace = j;
+  		}
+  	}else if(judge == 0 && judge_mul == 1 && tokens[j].type == '*'){
+  		judge_mul *= 2;
+  		muplace = j;
+  	}else if(judge == 0 && judge_mul == 1 && tokens[j].type == '/'){
+  		judge_div *= 2;
+  		diplace = j;
+  	}else if(judge == 0 && tokens[j].type == TK_NOT){
+  		nottplace = j;
   	}
   }
-  if(sign % 2 == 0){
-  	return place;
-  }else{
+  if(adplace != -1){
+  	return adplace;
+  }
+  else if(miplace != -1){
+  	return miplace;
+  }
+  else if(judge_mul == 2){
+  	return muplace;
+  }
+  else if(judge_mul == 1 && diplace != -1){
+  	return diplace;
+  }
+  else if(nottplace != -1){
+  	return nottplace;
+  }
+  else{
 	  check_wrong = false;
 	  return 0;
   }
@@ -201,8 +245,6 @@ int searchmo(int p, int q){
 int eval(int p, int q){
   int value_1 = 0;
   int value_2 = 0;
-  int hhh_1 = 1;
-  int hhh_2 = 0;
   if(check_wrong == false){
   	return 1;
   }else{
@@ -227,13 +269,13 @@ int eval(int p, int q){
   }else{
   	int op;
   	op = searchmo(p, q);
-  	if(op == p){
-  		hhh_1 = 0;
-  		hhh_2 = -1;
-  	}
   	printf("op = %d\n", op);
-	value_1 = hhh_1*eval(p, op-1);
-	value_2 = hhh_2*eval(op+1, q);
+  	if(op == p){
+		value_1 = 0;
+  	}else{  	
+		value_1 = eval(p, op-1);
+	}
+	value_2 = eval(op+1, q);
 	printf("value_1=%d value_2=%d\n", value_1, value_2);
 	switch (tokens[op].type){
 		case '+':
@@ -248,6 +290,36 @@ int eval(int p, int q){
 				return 0;
 			}
 			return value_1/value_2;
+		case TK_EQ:
+			return value_1 == value_2;
+		case TK_UNEQ:
+			return value_1 != value_2;
+		case TK_AND:
+			if((value_1 == 1 || value_1 == 0) && (value_2 == 1 || value_2 == 0)){
+				return value_1 && value_2;
+			}else{
+				check_wrong = false;
+				return 0;
+			}
+		case TK_OR:
+			if((value_1 == 1 || value_1 == 0) && (value_2 == 1 || value_2 == 0)){
+				return value_1 || value_2;
+			}else{
+				check_wrong = false;
+				return 0;
+			}
+		case TK_NOT:
+			if((value_1 == 1 || value_1 == 0) && (value_2 == 1 || value_2 == 0)){
+				if(value_2 == 1){
+					value_2 = 0;
+				}else{
+					value_2 = 1;
+				}
+				return value_1 + value_2;
+			}else{
+				check_wrong = false;
+				return 0;
+			}
 		default : 
 			check_wrong = false;
 			return 1;
