@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_NUM, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT,
+  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, 
 
   /* TODO: Add more token types */
 
@@ -35,7 +35,7 @@ static struct rule {
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
    */
-  {"[0-9]+", TK_NUM},   // dec
+
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"-", '-'},		// minus
@@ -47,7 +47,9 @@ static struct rule {
   {"!=", TK_UNEQ},	// unequal
   {"&&", TK_AND},	// and
   {"\\|\\|", TK_OR},	// or
-  {"[!(?!=)]", TK_NOT},	// not
+  {"[!+(?!=)]", TK_NOT},	// not
+  {"[0][x]", TK_SIXT},			// sixt
+  {"[0-9A-F]+", TK_NUM},   // dec
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -115,6 +117,7 @@ static bool make_token(char *e) {
         	case TK_AND:
         	case TK_OR:
         	case TK_NOT:
+        	case TK_SIXT:
         	case TK_NUM:
         		tokens[nr_token].type=rules[i].token_type;
         		tokens[nr_token].str[substr_len] = '\0';
@@ -183,6 +186,7 @@ int searchmo(int p, int q){
   int muplace = 1;
   int diplace = -1;
   int nottplace = -1;
+  int sixtplace = -1;
   for(j = p; j <= q; j++)
   {
   	if(tokens[j].type == '('){
@@ -219,6 +223,8 @@ int searchmo(int p, int q){
   		diplace = j;
   	}else if(judge == 0 && tokens[j].type == TK_NOT){
   		nottplace = j;
+  	}else if(judge == 0 && tokens[j].type == TK_SIXT){
+  		sixtplace = j;
   	}
   }
   if(adplace != -1){
@@ -236,10 +242,81 @@ int searchmo(int p, int q){
   else if(nottplace != -1){
   	return nottplace;
   }
+  else if(sixtplace != -1){
+	return sixtplace;
+  }
   else{
 	  check_wrong = false;
 	  return 0;
   }
+}
+
+int sixtoten(const char *sixtstr){
+	int i = 0;
+	int sgwei = 1;
+	int final = 0;
+	for(; sixtstr[i] != '\0'; i++){
+		//printf("%c \n", sixtstr[i]);
+		if(sixtstr[i]=='0'){
+			final += 0*sgwei;
+		}else if(sixtstr[i]=='1'){
+			final += 1*sgwei;
+		}else if(sixtstr[i]=='2'){
+			final += 2*sgwei;
+		}else if(sixtstr[i]=='3'){
+			final += 3*sgwei;
+		}else if(sixtstr[i]=='4'){
+			final += 4*sgwei;
+		}else if(sixtstr[i]=='5'){
+			final += 5*sgwei;
+		}else if(sixtstr[i]=='6'){
+			final += 6*sgwei;
+		}else if(sixtstr[i]=='7'){
+			final += 7*sgwei;
+		}else if(sixtstr[i]=='8'){
+			final += 8*sgwei;
+		}else if(sixtstr[i]=='9'){
+			final += 9*sgwei;
+		}else if(sixtstr[i]=='A'){
+			final += 10*sgwei;
+		}else if(sixtstr[i]=='B'){
+			final += 11*sgwei;
+		}else if(sixtstr[i]=='C'){
+			final += 12*sgwei;
+		}else if(sixtstr[i]=='D'){
+			final += 13*sgwei;
+		}else if(sixtstr[i]=='E'){
+			final += 14*sgwei;
+		}else if(sixtstr[i]=='F'){
+			final += 15*sgwei;
+		}else{
+			check_wrong = false;
+			return 1;
+		}
+//		switch (sixtstr[i]){
+//			case '0': final += 0;
+//			case '1': final += 1*sgwei;
+//			case '2': final += 2*sgwei;
+//			case '3': final += 3*sgwei;
+///			case '4': final += 4*sgwei;
+//			case '5': final += 5*sgwei;
+//			case '6': final += 6*sgwei;
+//			case '7': final += 7*sgwei;
+///			case '8': final += 8*sgwei;
+//			case '9': final += 9*sgwei;
+///			case 'A': final += 10*sgwei;
+//			case 'B': final += 11*sgwei;
+//			case 'C': final += 12*sgwei;
+//			case 'D': final += 13*sgwei;
+//			case 'E': final += 14*sgwei;
+//			case 'F': final += 15*sgwei;
+//			default : check_wrong = false;
+///				  return 1;
+//		}
+		sgwei *= 16;
+	}
+	printf("%d\n", final);
+	return final;
 }
 
 int eval(int p, int q){
@@ -259,8 +336,13 @@ int eval(int p, int q){
   		check_wrong = false;
   		return 1;
   	}else{
-  		printf("num=%d\n", atoi(tokens[p].str));
-  		return atoi(tokens[p].str);
+  		if(tokens[p-1].type == TK_SIXT){
+  			printf("numx=%d\n", sixtoten(tokens[p].str));
+  			return sixtoten(tokens[p].str);
+  		}else{
+  			printf("num=%d\n", atoi(tokens[p].str));
+  			return atoi(tokens[p].str);
+  		}
   	}
   }
   else if(check_parentheses(p, q) == true) {
@@ -320,6 +402,8 @@ int eval(int p, int q){
 				check_wrong = false;
 				return 0;
 			}
+		case TK_SIXT:
+			return value_1+value_2;
 		default : 
 			check_wrong = false;
 			return 1;
