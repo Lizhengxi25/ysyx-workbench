@@ -29,7 +29,7 @@ module ALU(x, y, judge, result, overflow);
 			/* verilator lint_on WIDTHEXPAND */
 			/* verilator lint_on WIDTHTRUNC */
 			/* verilator lint_off SELRANGE */
-			overflow = (x[7]==y[7]) && (result[7]!=x[7]);
+			overflow = (x[7]!=y[7]) && (result[7]!=x[7]);
 			/* verilator lint_on UNSIGNED */
 			/* verilator lint_on SELRANGE */
 		end
