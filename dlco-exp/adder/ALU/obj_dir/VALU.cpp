@@ -9,21 +9,18 @@
 // Constructors
 
 VALU::VALU(VerilatedContext* _vcontextp__, const char* _vcname__)
-    : VerilatedModel{*_vcontextp__}
-    , vlSymsp{new VALU__Syms(contextp(), _vcname__, this)}
-    , overflow{vlSymsp->TOP.overflow}
+    : vlSymsp{new VALU__Syms(_vcontextp__, _vcname__, this)}
     , x{vlSymsp->TOP.x}
     , y{vlSymsp->TOP.y}
     , judge{vlSymsp->TOP.judge}
     , result{vlSymsp->TOP.result}
+    , overflow{vlSymsp->TOP.overflow}
     , rootp{&(vlSymsp->TOP)}
 {
-    // Register model with the context
-    contextp()->addModel(this);
 }
 
 VALU::VALU(const char* _vcname__)
-    : VALU(Verilated::threadContextp(), _vcname__)
+    : VALU(nullptr, _vcname__)
 {
 }
 
@@ -35,15 +32,43 @@ VALU::~VALU() {
 }
 
 //============================================================
-// Evaluation function
+// Evaluation loop
 
-#ifdef VL_DEBUG
-void VALU___024root___eval_debug_assertions(VALU___024root* vlSelf);
-#endif  // VL_DEBUG
-void VALU___024root___eval_static(VALU___024root* vlSelf);
 void VALU___024root___eval_initial(VALU___024root* vlSelf);
 void VALU___024root___eval_settle(VALU___024root* vlSelf);
 void VALU___024root___eval(VALU___024root* vlSelf);
+QData VALU___024root___change_request(VALU___024root* vlSelf);
+#ifdef VL_DEBUG
+void VALU___024root___eval_debug_assertions(VALU___024root* vlSelf);
+#endif  // VL_DEBUG
+void VALU___024root___final(VALU___024root* vlSelf);
+
+static void _eval_initial_loop(VALU__Syms* __restrict vlSymsp) {
+    vlSymsp->__Vm_didInit = true;
+    VALU___024root___eval_initial(&(vlSymsp->TOP));
+    // Evaluate till stable
+    int __VclockLoop = 0;
+    QData __Vchange = 1;
+    vlSymsp->__Vm_activity = true;
+    do {
+        VL_DEBUG_IF(VL_DBG_MSGF("+ Initial loop\n"););
+        VALU___024root___eval_settle(&(vlSymsp->TOP));
+        VALU___024root___eval(&(vlSymsp->TOP));
+        if (VL_UNLIKELY(++__VclockLoop > 100)) {
+            // About to fail, so enable debug to see what's not settling.
+            // Note you must run make with OPT=-DVL_DEBUG for debug prints.
+            int __Vsaved_debug = Verilated::debug();
+            Verilated::debug(1);
+            __Vchange = VALU___024root___change_request(&(vlSymsp->TOP));
+            Verilated::debug(__Vsaved_debug);
+            VL_FATAL_MT("ALU.v", 1, "",
+                "Verilated model didn't DC converge\n"
+                "- See https://verilator.org/warn/DIDNOTCONVERGE");
+        } else {
+            __Vchange = VALU___024root___change_request(&(vlSymsp->TOP));
+        }
+    } while (VL_UNLIKELY(__Vchange));
+}
 
 void VALU::eval_step() {
     VL_DEBUG_IF(VL_DBG_MSGF("+++++TOP Evaluate VALU::eval_step\n"); );
@@ -51,66 +76,55 @@ void VALU::eval_step() {
     // Debug assertions
     VALU___024root___eval_debug_assertions(&(vlSymsp->TOP));
 #endif  // VL_DEBUG
+    // Initialize
+    if (VL_UNLIKELY(!vlSymsp->__Vm_didInit)) _eval_initial_loop(vlSymsp);
+    // Evaluate till stable
+    int __VclockLoop = 0;
+    QData __Vchange = 1;
     vlSymsp->__Vm_activity = true;
-    vlSymsp->__Vm_deleter.deleteAll();
-    if (VL_UNLIKELY(!vlSymsp->__Vm_didInit)) {
-        vlSymsp->__Vm_didInit = true;
-        VL_DEBUG_IF(VL_DBG_MSGF("+ Initial\n"););
-        VALU___024root___eval_static(&(vlSymsp->TOP));
-        VALU___024root___eval_initial(&(vlSymsp->TOP));
-        VALU___024root___eval_settle(&(vlSymsp->TOP));
-    }
-    // MTask 0 start
-    VL_DEBUG_IF(VL_DBG_MSGF("MTask0 starting\n"););
-    Verilated::mtaskId(0);
-    VL_DEBUG_IF(VL_DBG_MSGF("+ Eval\n"););
-    VALU___024root___eval(&(vlSymsp->TOP));
-    // Evaluate cleanup
-    Verilated::endOfThreadMTask(vlSymsp->__Vm_evalMsgQp);
-    Verilated::endOfEval(vlSymsp->__Vm_evalMsgQp);
+    do {
+        VL_DEBUG_IF(VL_DBG_MSGF("+ Clock loop\n"););
+        VALU___024root___eval(&(vlSymsp->TOP));
+        if (VL_UNLIKELY(++__VclockLoop > 100)) {
+            // About to fail, so enable debug to see what's not settling.
+            // Note you must run make with OPT=-DVL_DEBUG for debug prints.
+            int __Vsaved_debug = Verilated::debug();
+            Verilated::debug(1);
+            __Vchange = VALU___024root___change_request(&(vlSymsp->TOP));
+            Verilated::debug(__Vsaved_debug);
+            VL_FATAL_MT("ALU.v", 1, "",
+                "Verilated model didn't converge\n"
+                "- See https://verilator.org/warn/DIDNOTCONVERGE");
+        } else {
+            __Vchange = VALU___024root___change_request(&(vlSymsp->TOP));
+        }
+    } while (VL_UNLIKELY(__Vchange));
 }
 
 //============================================================
-// Events and timing
-bool VALU::eventsPending() { return false; }
+// Invoke final blocks
 
-uint64_t VALU::nextTimeSlot() {
-    VL_FATAL_MT(__FILE__, __LINE__, "", "%Error: No delays in the design");
-    return 0;
+void VALU::final() {
+    VALU___024root___final(&(vlSymsp->TOP));
 }
 
 //============================================================
 // Utilities
+
+VerilatedContext* VALU::contextp() const {
+    return vlSymsp->_vm_contextp__;
+}
 
 const char* VALU::name() const {
     return vlSymsp->name();
 }
 
 //============================================================
-// Invoke final blocks
-
-void VALU___024root___eval_final(VALU___024root* vlSelf);
-
-VL_ATTR_COLD void VALU::final() {
-    VALU___024root___eval_final(&(vlSymsp->TOP));
-}
-
-//============================================================
-// Implementations of abstract methods from VerilatedModel
-
-const char* VALU::hierName() const { return vlSymsp->name(); }
-const char* VALU::modelName() const { return "VALU"; }
-unsigned VALU::threads() const { return 1; }
-std::unique_ptr<VerilatedTraceConfig> VALU::traceConfig() const {
-    return std::unique_ptr<VerilatedTraceConfig>{new VerilatedTraceConfig{false, false, false}};
-};
-
-//============================================================
 // Trace configuration
 
-void VALU___024root__trace_init_top(VALU___024root* vlSelf, VerilatedVcd* tracep);
+void VALU___024root__traceInitTop(VALU___024root* vlSelf, VerilatedVcd* tracep);
 
-VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32_t code) {
+static void traceInit(void* voidSelf, VerilatedVcd* tracep, uint32_t code) {
     // Callback from tracep->open()
     VALU___024root* const __restrict vlSelf VL_ATTR_UNUSED = static_cast<VALU___024root*>(voidSelf);
     VALU__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -119,21 +133,15 @@ VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32
             "Turning on wave traces requires Verilated::traceEverOn(true) call before time 0.");
     }
     vlSymsp->__Vm_baseCode = code;
+    tracep->module(vlSymsp->name());
     tracep->scopeEscape(' ');
-    tracep->pushNamePrefix(std::string{vlSymsp->name()} + ' ');
-    VALU___024root__trace_init_top(vlSelf, tracep);
-    tracep->popNamePrefix();
+    VALU___024root__traceInitTop(vlSelf, tracep);
     tracep->scopeEscape('.');
 }
 
-VL_ATTR_COLD void VALU___024root__trace_register(VALU___024root* vlSelf, VerilatedVcd* tracep);
+void VALU___024root__traceRegister(VALU___024root* vlSelf, VerilatedVcd* tracep);
 
-VL_ATTR_COLD void VALU::trace(VerilatedVcdC* tfp, int levels, int options) {
-    if (tfp->isOpen()) {
-        vl_fatal(__FILE__, __LINE__, __FILE__,"'VALU::trace()' shall not be called after 'VerilatedVcdC::open()'.");
-    }
-    if (false && levels && options) {}  // Prevent unused
-    tfp->spTrace()->addModel(this);
-    tfp->spTrace()->addInitCb(&trace_init, &(vlSymsp->TOP));
-    VALU___024root__trace_register(&(vlSymsp->TOP), tfp->spTrace());
+void VALU::trace(VerilatedVcdC* tfp, int, int) {
+    tfp->spTrace()->addInitCb(&traceInit, &(vlSymsp->TOP));
+    VALU___024root__traceRegister(&(vlSymsp->TOP), tfp->spTrace());
 }

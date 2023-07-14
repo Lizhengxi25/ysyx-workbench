@@ -43,7 +43,9 @@ int main(){
 	top->judge=0b011;	top->x=0b01010110;	top->y=0b00000100; step_and_dump_wave();
 	top->judge=0b100;	top->x=0b10101010;	top->y=0b01010101; step_and_dump_wave();
 	top->judge=0b101;	top->x=0b00000010;	top->y=0b00000001; step_and_dump_wave();
-	top->judge=0b110;	top->x=0b11111110;	top->y=0b00000001; step_and_dump_wave();
+	top->judge=0b110;	top->x=-1;	top->y=2; step_and_dump_wave();
+				top->x=-2;	top->y=-3; step_and_dump_wave();
+				top->x=-2;	top->y=-2; step_and_dump_wave();
 	top->judge=0b111;	top->x=0b00000001;	top->y=0b00000011; step_and_dump_wave();
 							top->y=0b00000001; step_and_dump_wave();
 	

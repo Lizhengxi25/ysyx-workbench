@@ -8,14 +8,16 @@
 #ifndef VERILATED_VALU_H_
 #define VERILATED_VALU_H_  // guard
 
-#include "verilated.h"
+#include "verilated_heavy.h"
 
 class VALU__Syms;
 class VALU___024root;
 class VerilatedVcdC;
+class VALU_VerilatedVcd;
+
 
 // This class is the main interface to the Verilated model
-class VALU VL_NOT_FINAL : public VerilatedModel {
+class VALU VL_NOT_FINAL {
   private:
     // Symbol table holding complete model state (owned by this class)
     VALU__Syms* const vlSymsp;
@@ -25,11 +27,11 @@ class VALU VL_NOT_FINAL : public VerilatedModel {
     // PORTS
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
-    VL_OUT8(&overflow,0,0);
     VL_IN8(&x,7,0);
     VL_IN8(&y,7,0);
     VL_IN8(&judge,2,0);
     VL_OUT8(&result,7,0);
+    VL_OUT8(&overflow,0,0);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.
@@ -62,20 +64,13 @@ class VALU VL_NOT_FINAL : public VerilatedModel {
     void eval_end_step() {}
     /// Simulation complete, run final blocks.  Application must call on completion.
     void final();
-    /// Are there scheduled events to handle?
-    bool eventsPending();
-    /// Returns time at next time slot. Aborts if !eventsPending()
-    uint64_t nextTimeSlot();
     /// Trace signals in the model; called by application code
     void trace(VerilatedVcdC* tfp, int levels, int options = 0);
+    /// Return current simulation context for this model.
+    /// Used to get to e.g. simulation time via contextp()->time()
+    VerilatedContext* contextp() const;
     /// Retrieve name of this model instance (as passed to constructor).
     const char* name() const;
-
-    // Abstract methods from VerilatedModel
-    const char* hierName() const override final;
-    const char* modelName() const override final;
-    unsigned threads() const override final;
-    std::unique_ptr<VerilatedTraceConfig> traceConfig() const override final;
 } VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
 
 #endif  // guard

@@ -7,7 +7,7 @@
 #ifndef VERILATED_VALU__SYMS_H_
 #define VERILATED_VALU__SYMS_H_  // guard
 
-#include "verilated.h"
+#include "verilated_heavy.h"
 
 // INCLUDE MODEL CLASS
 
@@ -23,7 +23,6 @@ class VALU__Syms final : public VerilatedSyms {
     VALU* const __Vm_modelp;
     bool __Vm_activity = false;  ///< Used by trace routines to determine change occurred
     uint32_t __Vm_baseCode = 0;  ///< Used by trace routines when tracing multiple models
-    VlDeleter __Vm_deleter;
     bool __Vm_didInit = false;
 
     // MODULE INSTANCE STATE

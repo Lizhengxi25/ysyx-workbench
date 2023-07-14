@@ -5,39 +5,41 @@
 #ifndef VERILATED_VALU___024ROOT_H_
 #define VERILATED_VALU___024ROOT_H_  // guard
 
-#include "verilated.h"
+#include "verilated_heavy.h"
+
+//==========
 
 class VALU__Syms;
+class VALU_VerilatedVcd;
 
-class VALU___024root final : public VerilatedModule {
+
+//----------
+
+VL_MODULE(VALU___024root) {
   public:
 
-    // DESIGN SPECIFIC STATE
-    VL_OUT8(overflow,0,0);
+    // PORTS
     VL_IN8(x,7,0);
     VL_IN8(y,7,0);
     VL_IN8(judge,2,0);
     VL_OUT8(result,7,0);
-    CData/*0:0*/ __VactContinue;
-    IData/*31:0*/ __VstlIterCount;
-    IData/*31:0*/ __VicoIterCount;
-    IData/*31:0*/ __VactIterCount;
-    VlTriggerVec<1> __VstlTriggered;
-    VlTriggerVec<1> __VicoTriggered;
-    VlTriggerVec<0> __VactTriggered;
-    VlTriggerVec<0> __VnbaTriggered;
+    VL_OUT8(overflow,0,0);
 
     // INTERNAL VARIABLES
-    VALU__Syms* const vlSymsp;
+    VALU__Syms* vlSymsp;  // Symbol table
 
     // CONSTRUCTORS
-    VALU___024root(VALU__Syms* symsp, const char* v__name);
+  private:
+    VL_UNCOPYABLE(VALU___024root);  ///< Copying not allowed
+  public:
+    VALU___024root(const char* name);
     ~VALU___024root();
-    VL_UNCOPYABLE(VALU___024root);
 
     // INTERNAL METHODS
-    void __Vconfigure(bool first);
+    void __Vconfigure(VALU__Syms* symsp, bool first);
 } VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
+
+//----------
 
 
 #endif  // guard
