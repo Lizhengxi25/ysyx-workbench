@@ -256,6 +256,9 @@ int sixtoten(const char *sixtstr){
 	int sgwei = 1;
 	int final = 0;
 	for(; sixtstr[i] != '\0'; i++){
+		;
+	}
+	for(i-=1; i >= 0; i--){
 		//printf("%c \n", sixtstr[i]);
 		if(sixtstr[i]=='0'){
 			final += 0*sgwei;
