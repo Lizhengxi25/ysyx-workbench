@@ -49,7 +49,7 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-  printf(" ");
+  printf("路漫漫其修远兮，吾将上下而求索\n");
   return -1;
 }
 

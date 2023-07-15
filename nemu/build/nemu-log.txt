@@ -4,23 +4,3 @@
 [1;34m[src/monitor/monitor.c:28 welcome] Trace: [1;32mON[0m[0m
 [1;34m[src/monitor/monitor.c:29 welcome] If trace is enabled, a log file will be generated to record the trace. This may lead to a large log file. If it is not necessary, you can disable it in menuconfig[0m
 [1;34m[src/monitor/monitor.c:32 welcome] Build time: 14:34:36, Jun 27 2023[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 0 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 2 with len 3: 001[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[1] = "\+" at position 5 with len 1: +[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 6 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 8 with len 1: 1[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 0 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 2 with len 3: 001[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[1] = "\+" at position 5 with len 1: +[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 6 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 8 with len 4: 0001[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 0 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 2 with len 3: 002[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[1] = "\+" at position 5 with len 1: +[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 6 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 8 with len 4: 0001[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 0 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 2 with len 3: 002[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[4] = "/" at position 5 with len 1: /[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[12] = "[0][x]" at position 6 with len 2: 0x[0m
-[1;34m[src/monitor/sdb/expr.c:98 make_token] match rules[13] = "[0-9A-F]+" at position 8 with len 1: 1[0m
