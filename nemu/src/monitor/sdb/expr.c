@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, TK_REG, TK_REGNAME,
+  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, TK_REG, TK_REGNAME, TK_LESS, TK_LESSEQ, TK_BIG, TK_BIGEQ
 
   /* TODO: Add more token types */
 
@@ -52,6 +52,10 @@ static struct rule {
   {"[0-9A-F]+", TK_NUM},   // dec
   {"\\$", TK_REG},
   {"[$, r, s, g, t, a][0-9]", TK_REGNAME},
+  {"<", TK_LESS},
+  {"<=", TK_LESSEQ},
+  {">", TK_BIG},
+  {">=", TK_BIGEQ},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -123,6 +127,10 @@ static bool make_token(char *e) {
         	case TK_NUM:
 			case TK_REG:
 			case TK_REGNAME:
+			case TK_LESS:
+			case TK_LESSEQ:
+			case TK_BIG:
+			case TK_BIGEQ:
         		tokens[nr_token].type=rules[i].token_type;
         		tokens[nr_token].str[substr_len] = '\0';
         		strncpy(tokens[nr_token++].str, substr_start, substr_len);
@@ -203,10 +211,17 @@ int searchmo(int p, int q){
   	}else if(judge != 0){
   		continue;
   	}else if(judge == 0 && tokens[j].type == TK_EQ){
-  		judge_eq = 0;
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_LESS){
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_LESSEQ){
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_BIG){
+  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_BIGEQ){
   		return j;
   	}else if(judge == 0 && tokens[j].type == TK_UNEQ){
-  		judge_eq = 0;
+  		//judge_eq = 0;
   		return j;
   	}else if(judge == 0 && tokens[j].type == TK_AND){
   		
@@ -354,7 +369,7 @@ int eval(int p, int q){
   			printf("numx=%d\n", sixtoten(tokens[p].str));
   			return sixtoten(tokens[p].str);
   		}else if(tokens[p].type == TK_NUM){
-  			printf("num=%d\n", atoi(tokens[p].str));
+  			printf("num=%d, type is %d\n", atoi(tokens[p].str), tokens[p].type);
   			return atoi(tokens[p].str);
   		}else{
 			if(strcmp(tokens[p].str, "$0")==1){
@@ -459,6 +474,14 @@ int eval(int p, int q){
 			return value_1/value_2;
 		case TK_EQ:
 			return value_1 == value_2;
+		case TK_LESS:
+			return value_1 < value_2;
+		case TK_LESSEQ:
+			return value_1 <= value_2;
+		case TK_BIG:
+			return value_1 > value_2;
+		case TK_BIGEQ:
+			return value_1 >= value_2;
 		case TK_UNEQ:
 			return value_1 != value_2;
 		case TK_AND:
