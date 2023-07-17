@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, TK_REG,
+  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, TK_REG, TK_REGNAME,
 
   /* TODO: Add more token types */
 
@@ -51,6 +51,7 @@ static struct rule {
   {"[0][x]", TK_SIXT},			// sixt
   {"[0-9A-F]+", TK_NUM},   // dec
   {"\\$", TK_REG},
+  {"[$, r, s, g, t, a][0-9]", TK_REGNAME},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -121,6 +122,7 @@ static bool make_token(char *e) {
         	case TK_SIXT:
         	case TK_NUM:
 			case TK_REG:
+			case TK_REGNAME:
         		tokens[nr_token].type=rules[i].token_type;
         		tokens[nr_token].str[substr_len] = '\0';
         		strncpy(tokens[nr_token++].str, substr_start, substr_len);
@@ -344,17 +346,86 @@ int eval(int p, int q){
   }
   else if(p == q) {
   	/*single number*/
-  	if(tokens[p].type != TK_NUM){
+  	if(tokens[p].type != TK_NUM && tokens[p].type != TK_REGNAME){
   		check_wrong = false;
   		return 1;
   	}else{
   		if(tokens[p-1].type == TK_SIXT){
   			printf("numx=%d\n", sixtoten(tokens[p].str));
   			return sixtoten(tokens[p].str);
-  		}else{
+  		}else if(tokens[p].type == TK_NUM){
   			printf("num=%d\n", atoi(tokens[p].str));
   			return atoi(tokens[p].str);
-  		}
+  		}else{
+			if(strcmp(tokens[p].str, "$0")==1){
+				return 0;
+			}else if(strcmp(tokens[p].str, "ra")==1){
+				return 1;
+			}else if(strcmp(tokens[p].str, "sp")==1){
+				return 2;
+			}else if(strcmp(tokens[p].str, "gp")==1){
+				return 3;
+			}else if(strcmp(tokens[p].str, "tp")==1){
+				return 4;
+			}else if(strcmp(tokens[p].str, "t0")==1){
+				return 5;
+			}else if(strcmp(tokens[p].str, "t1")==1){
+				return 6;
+			}else if(strcmp(tokens[p].str, "t2")==1){
+				return 7;
+			}else if(strcmp(tokens[p].str, "s0")==1){
+				return 8;
+			}else if(strcmp(tokens[p].str, "s1")==1){
+				return 9;
+			}else if(strcmp(tokens[p].str, "a0")==1){
+				return 10;
+			}else if(strcmp(tokens[p].str, "a1")==1){
+				return 11;
+			}else if(strcmp(tokens[p].str, "a2")==1){
+				return 12;
+			}else if(strcmp(tokens[p].str, "a3")==1){
+				return 13;
+			}else if(strcmp(tokens[p].str, "a4")==1){
+				return 14;
+			}else if(strcmp(tokens[p].str, "a5")==1){
+				return 15;
+			}else if(strcmp(tokens[p].str, "a6")==1){
+				return 16;
+			}else if(strcmp(tokens[p].str, "a7")==1){
+				return 17;
+			}else if(strcmp(tokens[p].str, "s2")==1){
+				return 18;
+			}else if(strcmp(tokens[p].str, "s3")==1){
+				return 19;
+			}else if(strcmp(tokens[p].str, "s4")==1){
+				return 20;
+			}else if(strcmp(tokens[p].str, "s5")==1){
+				return 21;
+			}else if(strcmp(tokens[p].str, "s6")==1){
+				return 22;
+			}else if(strcmp(tokens[p].str, "s7")==1){
+				return 23;
+			}else if(strcmp(tokens[p].str, "s8")==1){
+				return 24;
+			}else if(strcmp(tokens[p].str, "s9")==1){
+				return 25;
+			}else if(strcmp(tokens[p].str, "s10")==1){
+				return 26;
+			}else if(strcmp(tokens[p].str, "s11")==1){
+				return 27;
+			}else if(strcmp(tokens[p].str, "t3")==1){
+				return 28;
+			}else if(strcmp(tokens[p].str, "t4")==1){
+				return 29;
+			}else if(strcmp(tokens[p].str, "t5")==1){
+				return 30;
+			}else if(strcmp(tokens[p].str, "t6")==1){
+				return 31;
+			}else{
+				return 1;
+				check_wrong = false;
+			}
+		}
   	}
   }
   else if(check_parentheses(p, q) == true) {
@@ -377,7 +448,9 @@ int eval(int p, int q){
 		case '-':
 			return value_1-value_2;
 		case '*':
-			return value_1*value_2;
+			
+				return value_1*value_2;
+					
 		case '/':
 			if(value_2 == 0){
 				check_wrong = false;
