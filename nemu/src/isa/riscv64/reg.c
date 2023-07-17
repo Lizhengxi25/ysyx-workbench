@@ -25,10 +25,15 @@ const char *regs[] = {
 
 void isa_reg_display() {
   for(int i = 0; i < 32; i++){
-	printf("0x%2d, %lx\n", i, cpu.gpr[i]);
+	printf("%2d regs[%s] = %lx\n", i, regs[i], cpu.gpr[i]);
   }
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+  if(*success == false){
+    return 0;
+  }else{
+    ;
+  }
   return 0;
 }

@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, 
+  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, TK_REG,
 
   /* TODO: Add more token types */
 
@@ -50,6 +50,7 @@ static struct rule {
   {"[!+(?!=)]", TK_NOT},	// not
   {"[0][x]", TK_SIXT},			// sixt
   {"[0-9A-F]+", TK_NUM},   // dec
+  {"\\$", TK_REG},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -119,6 +120,7 @@ static bool make_token(char *e) {
         	case TK_NOT:
         	case TK_SIXT:
         	case TK_NUM:
+			case TK_REG:
         		tokens[nr_token].type=rules[i].token_type;
         		tokens[nr_token].str[substr_len] = '\0';
         		strncpy(tokens[nr_token++].str, substr_start, substr_len);
@@ -187,6 +189,7 @@ int searchmo(int p, int q){
   int diplace = -1;
   int nottplace = -1;
   int sixtplace = -1;
+  int regplace = -1;
   for(j = p; j <= q; j++)
   {
   	if(tokens[j].type == '('){
@@ -223,7 +226,10 @@ int searchmo(int p, int q){
   		diplace = j;
   	}else if(judge == 0 && tokens[j].type == TK_NOT){
   		nottplace = j;
-  	}else if(judge == 0 && tokens[j].type == TK_SIXT){
+  	}else if(judge == 0 && tokens[j].type == TK_REG){
+		regplace = j;
+	}
+	else if(judge == 0 && tokens[j].type == TK_SIXT){
   		sixtplace = j;
   	}
   }
@@ -241,6 +247,9 @@ int searchmo(int p, int q){
   }
   else if(nottplace != -1){
   	return nottplace;
+  }
+  else if(regplace != -1){
+	return regplace;
   }
   else if(sixtplace != -1){
 	return sixtplace;
@@ -407,6 +416,12 @@ int eval(int p, int q){
 			}
 		case TK_SIXT:
 			return value_1+value_2;
+		case TK_REG:
+			int reg_name = value_1+value_2;
+			if(reg_name > 31){
+				check_wrong = false;
+			}
+			return cpu.gpr[reg_name];
 		default : 
 			check_wrong = false;
 			return 1;
