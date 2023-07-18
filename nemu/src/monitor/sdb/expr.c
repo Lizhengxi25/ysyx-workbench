@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_UNEQ, TK_AND, TK_OR, TK_NOT, TK_SIXT, TK_NUM, TK_REG, TK_REGNAME, TK_LESS, TK_LESSEQ, TK_BIG, TK_BIGEQ
+  TK_NOTYPE = 256, TK_EQ, TK_AND, TK_OR, TK_NOT, TK_NOTEQ, TK_SIXT, TK_NUM, TK_REG, TK_REGNAME, TK_LESSEQ, TK_BIGEQ
 
   /* TODO: Add more token types */
 
@@ -44,18 +44,18 @@ static struct rule {
   {"\\(", '('},		// par1
   {"\\)", ')'},		// par2
   {"==", TK_EQ},        // equal
-  {"!=", TK_UNEQ},	// unequal
+  //{"[k]", TK_UNEQ},	// unequal
   {"&&", TK_AND},	// and
   {"\\|\\|", TK_OR},	// or
-  {"[!+(?!=)]", TK_NOT},	// not
+  {"!(=)?", TK_NOT},	// not
   {"[0][x]", TK_SIXT},			// sixt
   {"[0-9A-F]+", TK_NUM},   // dec
   {"\\$", TK_REG},
   {"[$, r, s, g, t, a][0-9]+", TK_REGNAME},
-  {"<", TK_LESS},
-  {"<=", TK_LESSEQ},
-  {">", TK_BIG},
-  {">=", TK_BIGEQ},
+  //{"[o]", TK_LESS},
+  {"<(=)?", TK_LESSEQ},
+  //{"[(>(?!=))]", TK_BIG},
+  {">(=)?", TK_BIGEQ},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -119,7 +119,7 @@ static bool make_token(char *e) {
         	case '(':
         	case ')':
         	case TK_EQ:
-        	case TK_UNEQ:
+        	
         	case TK_AND:
         	case TK_OR:
         	case TK_NOT:
@@ -127,9 +127,9 @@ static bool make_token(char *e) {
         	case TK_NUM:
 			case TK_REG:
 			case TK_REGNAME:
-			case TK_LESS:
+			
 			case TK_LESSEQ:
-			case TK_BIG:
+			
 			case TK_BIGEQ:
         		tokens[nr_token].type=rules[i].token_type;
         		tokens[nr_token].str[substr_len] = '\0';
@@ -200,6 +200,7 @@ int searchmo(int p, int q){
   int nottplace = -1;
   int sixtplace = -1;
   int regplace = -1;
+  
   for(j = p; j <= q; j++)
   {
   	if(tokens[j].type == '('){
@@ -212,19 +213,15 @@ int searchmo(int p, int q){
   		continue;
   	}else if(judge == 0 && tokens[j].type == TK_EQ){
   		return j;
-  	}else if(judge == 0 && tokens[j].type == TK_LESS){
-  		return j;
+  	}else if(judge == 0 && tokens[j].type == TK_NOT && strcmp(tokens[j].str, "!=")==0){
+  		tokens[j].type = TK_NOTEQ;
+		printf("success finding !=\n");
+		return j;
   	}else if(judge == 0 && tokens[j].type == TK_LESSEQ){
-  		return j;
-  	}else if(judge == 0 && tokens[j].type == TK_BIG){
   		return j;
   	}else if(judge == 0 && tokens[j].type == TK_BIGEQ){
   		return j;
-  	}else if(judge == 0 && tokens[j].type == TK_UNEQ){
-  		//judge_eq = 0;
-  		return j;
-  	}else if(judge == 0 && tokens[j].type == TK_AND){
-  		
+  	}else if(judge == 0 && tokens[j].type == TK_AND){		
   		return j;
   	}else if(judge == 0 && tokens[j].type == TK_OR){
   		
@@ -241,7 +238,7 @@ int searchmo(int p, int q){
   	}else if(judge == 0 && judge_mul == 1 && tokens[j].type == '/'){
   		judge_div *= 2;
   		diplace = j;
-  	}else if(judge == 0 && tokens[j].type == TK_NOT){
+  	}else if(judge == 0 && tokens[j].type == TK_NOT && strcmp(tokens[j].str, "!")==0){
   		nottplace = j;
   	}else if(judge == 0 && tokens[j].type == TK_REG){
 		regplace = j;
@@ -396,7 +393,7 @@ int eval(int p, int q){
 		value_1 = eval(p, op-1);
 	}
 	value_2 = eval(op+1, q);
-	printf("value_1=%d value_2=%d\n", value_1, value_2);
+	printf("*value_1=%d value_2=%d\n", value_1, value_2);
 	switch (tokens[op].type){
 		case '+':
 			return value_1+value_2;
@@ -414,16 +411,24 @@ int eval(int p, int q){
 			return value_1/value_2;
 		case TK_EQ:
 			return value_1 == value_2;
-		case TK_LESS:
-			return value_1 < value_2;
-		case TK_LESSEQ:
-			return value_1 <= value_2;
-		case TK_BIG:
-			return value_1 > value_2;
-		case TK_BIGEQ:
-			return value_1 >= value_2;
-		case TK_UNEQ:
+
+		case TK_NOTEQ:
 			return value_1 != value_2;
+
+		case TK_LESSEQ:
+			if(strcmp(tokens[op].str, "<")==1){
+				return value_1 < value_2;
+			}else{
+				return value_1 <= value_2;
+			}		
+
+		case TK_BIGEQ:
+			if(strcmp(tokens[op].str, ">")==1){
+				return value_1 > value_2;
+			}else{
+				return value_1 >= value_2;
+			}
+
 		case TK_AND:
 			if((value_1 == 1 || value_1 == 0) && (value_2 == 1 || value_2 == 0)){
 				return value_1 && value_2;
@@ -442,14 +447,17 @@ int eval(int p, int q){
 			if((value_1 == 1 || value_1 == 0) && (value_2 == 1 || value_2 == 0)){
 				if(value_2 == 1){
 					value_2 = 0;
+					printf("the number after ! is %d\n", 1);
 				}else{
 					value_2 = 1;
 				}
-				return value_1 + value_2;
-			}else{
-				check_wrong = false;
-				return 0;
-			}
+					return value_1 + value_2;
+				}else{
+					check_wrong = false;
+					return 0;
+				}
+			
+
 		case TK_SIXT:
 			return value_1+value_2;
 		case TK_REG:
