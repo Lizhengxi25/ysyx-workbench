@@ -51,7 +51,7 @@ static struct rule {
   {"[0][x]", TK_SIXT},			// sixt
   {"[0-9A-F]+", TK_NUM},   // dec
   {"\\$", TK_REG},
-  {"[$, r, s, g, t, a][0-9]", TK_REGNAME},
+  {"[$, r, s, g, t, a][0-9]+", TK_REGNAME},
   {"<", TK_LESS},
   {"<=", TK_LESSEQ},
   {">", TK_BIG},
@@ -372,73 +372,13 @@ int eval(int p, int q){
   			printf("num=%d, type is %d\n", atoi(tokens[p].str), tokens[p].type);
   			return atoi(tokens[p].str);
   		}else{
-			if(strcmp(tokens[p].str, "$0")==1){
-				return 0;
-			}else if(strcmp(tokens[p].str, "ra")==1){
+			bool success = true;
+			int reg_num = isa_reg_str2val(tokens[p].str, &success);
+			if(success == false){
+				check_wrong = true;
 				return 1;
-			}else if(strcmp(tokens[p].str, "sp")==1){
-				return 2;
-			}else if(strcmp(tokens[p].str, "gp")==1){
-				return 3;
-			}else if(strcmp(tokens[p].str, "tp")==1){
-				return 4;
-			}else if(strcmp(tokens[p].str, "t0")==1){
-				return 5;
-			}else if(strcmp(tokens[p].str, "t1")==1){
-				return 6;
-			}else if(strcmp(tokens[p].str, "t2")==1){
-				return 7;
-			}else if(strcmp(tokens[p].str, "s0")==1){
-				return 8;
-			}else if(strcmp(tokens[p].str, "s1")==1){
-				return 9;
-			}else if(strcmp(tokens[p].str, "a0")==1){
-				return 10;
-			}else if(strcmp(tokens[p].str, "a1")==1){
-				return 11;
-			}else if(strcmp(tokens[p].str, "a2")==1){
-				return 12;
-			}else if(strcmp(tokens[p].str, "a3")==1){
-				return 13;
-			}else if(strcmp(tokens[p].str, "a4")==1){
-				return 14;
-			}else if(strcmp(tokens[p].str, "a5")==1){
-				return 15;
-			}else if(strcmp(tokens[p].str, "a6")==1){
-				return 16;
-			}else if(strcmp(tokens[p].str, "a7")==1){
-				return 17;
-			}else if(strcmp(tokens[p].str, "s2")==1){
-				return 18;
-			}else if(strcmp(tokens[p].str, "s3")==1){
-				return 19;
-			}else if(strcmp(tokens[p].str, "s4")==1){
-				return 20;
-			}else if(strcmp(tokens[p].str, "s5")==1){
-				return 21;
-			}else if(strcmp(tokens[p].str, "s6")==1){
-				return 22;
-			}else if(strcmp(tokens[p].str, "s7")==1){
-				return 23;
-			}else if(strcmp(tokens[p].str, "s8")==1){
-				return 24;
-			}else if(strcmp(tokens[p].str, "s9")==1){
-				return 25;
-			}else if(strcmp(tokens[p].str, "s10")==1){
-				return 26;
-			}else if(strcmp(tokens[p].str, "s11")==1){
-				return 27;
-			}else if(strcmp(tokens[p].str, "t3")==1){
-				return 28;
-			}else if(strcmp(tokens[p].str, "t4")==1){
-				return 29;
-			}else if(strcmp(tokens[p].str, "t5")==1){
-				return 30;
-			}else if(strcmp(tokens[p].str, "t6")==1){
-				return 31;
 			}else{
-				return 1;
-				check_wrong = false;
+				return reg_num;
 			}
 		}
   	}

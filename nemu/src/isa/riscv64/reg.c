@@ -30,10 +30,12 @@ void isa_reg_display() {
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-  if(*success == false){
-    return 0;
-  }else{
-    ;
+  int i = 0;
+  for(; i < 32; i++){
+    if(strcmp(s, regs[i])==1){
+      return i;
+    }
   }
-  return 0;
+  *success = false;
+  return 1;
 }
